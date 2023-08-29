@@ -4,25 +4,29 @@ from flask import Flask, jsonify, request
 
 from model.twit import Twit
 
+from flask.json.provider import DefaultJSONProvider
+
 twits = []
 
-app = Flask(__name__)
 
-
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
+class CustomJSONProvider(DefaultJSONProvider):
+    @staticmethod
+    def default(obj):
         if isinstance(obj, Twit):
             return {'body': obj.body, 'author': obj.author}
         else:
-            return super().default(obj)
+            return DefaultJSONProvider.default(obj)
 
 
-app.json_encoder = CustomJSONEncoder
+app = Flask(__name__)
+
+app.json = CustomJSONProvider(app)
 
 
 @app.route('/twit', methods=['POST'])
 def create_twit():
-    '''{"body": "Hello world", "author": "@aqaguy"}'''
+    '''{"body": "Hello world", "author": "@aqaguy"}
+    '''
     twit_json = request.get_json()
     twit = Twit(twit_json['body'], twit_json['author'])
     twits.append(twit)
@@ -36,4 +40,3 @@ def read_twits():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
