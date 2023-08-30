@@ -1,19 +1,23 @@
 import json
-
 from flask import Flask, jsonify, request
-
-from model.twit import Twit
-
 from flask.json.provider import DefaultJSONProvider
+from model.post import Post
+from model.user import User
+from model.comment import Comment
+from model.storage import Storage
 
-twits = []
+storage = Storage()
 
 
 class CustomJSONProvider(DefaultJSONProvider):
     @staticmethod
     def default(obj):
-        if isinstance(obj, Twit):
-            return {'body': obj.body, 'author': obj.author}
+        if isinstance(obj, Post):
+            return {'body': obj.text, 'author': obj.author,
+                    'comments': obj.comments}
+        elif isinstance(obj, Comment):
+            return {'text': obj.text,
+                    'author': obj.author}
         else:
             return DefaultJSONProvider.default(obj)
 
@@ -23,19 +27,46 @@ app = Flask(__name__)
 app.json = CustomJSONProvider(app)
 
 
-@app.route('/twit', methods=['POST'])
-def create_twit():
-    '''{"body": "Hello world", "author": "@aqaguy"}
-    '''
-    twit_json = request.get_json()
-    twit = Twit(twit_json['body'], twit_json['author'])
-    twits.append(twit)
-    return jsonify({'status': 'success'})
+@app.route('/post/', methods=['GET'])
+def read_posts():
+    return jsonify(storage.read_posts())
 
 
-@app.route('/twit', methods=['GET'])
-def read_twits():
-    return jsonify({'twits': twits})
+@app.route('/post/', methods=['POST'])
+def create_post():
+    post_json = request.get_json()
+    post = Post(post_json['text'], post_json['author'])
+    post_id = storage.add_in_storage(post)
+    return jsonify({'status': 'success', 'msg': f'id {post_id} added'})
+
+
+@app.route('/post/<post_id>/', methods=['GET'])
+def read_post(post_id):
+    return jsonify(storage.read_post(post_id))
+
+
+@app.route('/post/<post_id>/', methods=['PUT'])
+def update_post(post_id):
+    post_json = request.get_json()
+    post = Post(post_json['text'], post_json['author'])
+    storage.update_post(post_id, post)
+    return jsonify({'status': 'success', 'msg': f'id {post_id} update'})
+
+
+@app.route('/post/<post_id>/', methods=['DELETE'])
+def delete_post(post_id):
+    storage.delete_post(post_id)
+    return jsonify({'status': 'success', 'msg': f'id {post_id} delete'})
+
+
+@app.route('/post/<post_id>/', methods=['POST'])
+def create_comment(post_id):
+    comment_json = request.get_json()
+    comment = Comment(post_id, comment_json['text'],
+                      comment_json['author'])
+    storage.create_comment(post_id, comment)
+    return jsonify(
+        {'status': 'success', 'msg': f'Comment to the post {post_id} created'})
 
 
 if __name__ == '__main__':
