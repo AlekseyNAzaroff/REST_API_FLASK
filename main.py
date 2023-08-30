@@ -7,7 +7,7 @@ from model.storage import Storage
 storage = Storage()
 
 
-class CustomJSONProvider(DefaultJSONProvider):
+class CustomJSONProvider(DefaultJSONProvider): #кастомный json-декодер для версии flsk 2.3
     @staticmethod
     def default(obj):
         if isinstance(obj, Post):
@@ -25,7 +25,7 @@ app = Flask(__name__)
 app.json = CustomJSONProvider(app)
 
 
-@app.route('/post/', methods=['POST'])
+@app.route('/post/', methods=['POST']) #контроллер создания поста
 def create_post():
     post_json = request.get_json()
     post = Post(post_json['text'], post_json['author'])
@@ -33,17 +33,17 @@ def create_post():
     return jsonify({'status': 'success', 'msg': f'id {post_id} added'})
 
 
-@app.route('/post/<post_id>/', methods=['GET'])
+@app.route('/post/<post_id>/', methods=['GET']) #контроллер просмотра поста
 def read_post(post_id):
     return jsonify(storage.read_post(post_id))
 
 
-@app.route('/post/', methods=['GET'])
+@app.route('/post/', methods=['GET']) #контроллер просмотра всех постов
 def read_posts():
     return jsonify(storage.read_posts())
 
 
-@app.route('/post/<post_id>/', methods=['PUT'])
+@app.route('/post/<post_id>/', methods=['PUT'])  #контроллер изменения поста
 def update_post(post_id):
     post_json = request.get_json()
     post = Post(post_json['text'], post_json['author'])
@@ -51,13 +51,13 @@ def update_post(post_id):
     return jsonify({'status': 'success', 'msg': f'id {post_id} update'})
 
 
-@app.route('/post/<post_id>/', methods=['DELETE'])
+@app.route('/post/<post_id>/', methods=['DELETE'])   #контроллер удаления поста
 def delete_post(post_id):
     storage.delete_post(post_id)
     return jsonify({'status': 'success', 'msg': f'id {post_id} delete'})
 
 
-@app.route('/post/<post_id>/', methods=['POST'])
+@app.route('/post/<post_id>/', methods=['POST'])   #контроллер создания комментария
 def create_comment(post_id):
     comment_json = request.get_json()
     comment = Comment(post_id, comment_json['text'],

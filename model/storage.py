@@ -7,27 +7,23 @@ class Storage:
         self.dict = {}
         self.counter_id = 0
 
-    def add_in_storage(self, post: Post):
+    def add_in_storage(self, post: Post):   #функция добавления поста в хранилище
         self.counter_id += 1
         self.dict[str(self.counter_id)] = post
         return str(self.counter_id)
 
-    def read_post(self, post_id: str):
+    def read_post(self, post_id: str):    #функция чтения поста
         return self.dict[post_id]
 
-    def read_posts(self):
+    def read_posts(self):     #функция чтения всех постов
         return self.dict
 
-    def update_post(self, post_id: str, post: Post):
+    def update_post(self, post_id: str, post: Post):     #функция изменения поста
         self.dict[str(post_id)] = post
 
-    def delete_post(self, post_id: str):
+    def delete_post(self, post_id: str):     #функция удаления поста
         del self.dict[post_id]
 
-    def create_comment(self, post_id: str, comment: Comment):
+    def create_comment(self, post_id: str, comment: Comment):     #функция создания комментария
         self.dict[post_id].comments.append(comment)
         return self.dict[post_id]
-
-# d = {'1': {'id': '1', 'text': 'post 1', 'author': 'alex', 'comment': []},
-#     '2': {'id': '2', 'text': 'post 2', 'author': 'alex', 'comment': []}
-# }
