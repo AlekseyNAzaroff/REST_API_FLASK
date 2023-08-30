@@ -14,4 +14,4 @@ venv/
 # PyCharm
 .idea/
 
-.templates/
+.template/

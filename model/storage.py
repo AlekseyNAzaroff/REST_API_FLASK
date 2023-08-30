@@ -28,8 +28,6 @@ class Storage:
         self.dict[post_id].comments.append(comment)
         return self.dict[post_id]
 
-
-
 # d = {'1': {'id': '1', 'text': 'post 1', 'author': 'alex', 'comment': []},
 #     '2': {'id': '2', 'text': 'post 2', 'author': 'alex', 'comment': []}
 # }

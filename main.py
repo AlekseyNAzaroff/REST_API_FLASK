@@ -1,8 +1,6 @@
-import json
 from flask import Flask, jsonify, request
 from flask.json.provider import DefaultJSONProvider
 from model.post import Post
-from model.user import User
 from model.comment import Comment
 from model.storage import Storage
 
@@ -27,11 +25,6 @@ app = Flask(__name__)
 app.json = CustomJSONProvider(app)
 
 
-@app.route('/post/', methods=['GET'])
-def read_posts():
-    return jsonify(storage.read_posts())
-
-
 @app.route('/post/', methods=['POST'])
 def create_post():
     post_json = request.get_json()
@@ -43,6 +36,11 @@ def create_post():
 @app.route('/post/<post_id>/', methods=['GET'])
 def read_post(post_id):
     return jsonify(storage.read_post(post_id))
+
+
+@app.route('/post/', methods=['GET'])
+def read_posts():
+    return jsonify(storage.read_posts())
 
 
 @app.route('/post/<post_id>/', methods=['PUT'])
